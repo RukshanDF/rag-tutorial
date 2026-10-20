@@ -1,0 +1,59 @@
+@import "tailwindcss";
+
+@layer base {
+  :root {
+    --bg-navy-950: #070b14;
+    --bg-navy-900: #0b1120;
+    --bg-navy-850: #0f172a;
+    --bg-card: #131c31;
+    --bg-card-hover: #19243f;
+    --border-subtle: #1e293b;
+    --border-accent: #0ea5e9;
+    --cyan-accent: #00f2fe;
+    --cyan-glow: rgba(0, 242, 254, 0.15);
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+
+  html {
+    scroll-behavior: smooth;
+    color-scheme: dark;
+  }
+
+  body {
+    background-color: #070b14;
+    color: #f8fafc;
+    overflow-x: hidden;
+  }
+}
+
+/* Custom scrollbars for chat message history */
+.chat-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-track {
+  background: rgba(15, 23, 42, 0.6);
+  border-radius: 9999px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb {
+  background: rgba(56, 189, 248, 0.25);
+  border-radius: 9999px;
+}
+
+.chat-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: rgba(56, 189, 248, 0.45);
+}
+
+/* Subtle tech grid background pattern */
+.bg-tech-pattern {
+  background-image: radial-gradient(
+      rgba(14, 165, 233, 0.08) 1px,
+      transparent 1px
+    ),
+    radial-gradient(rgba(99, 102, 241, 0.04) 1px, transparent 1px);
+  background-size: 32px 32px, 64px 64px;
+  background-position: 0 0, 16px 16px;
+}
