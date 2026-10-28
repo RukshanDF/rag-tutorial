@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { validateChatRequest } from "@/lib/validation";
-import { chat } from "@/lib/gemini";
+import { chatWithRAG } from "@/lib/gemini";
+import { evaluateGuardrails } from "@/lib/guardrails";
 
 /**
  * Basic in-memory rate limiter for local demonstration.
@@ -63,14 +64,36 @@ export async function POST(request: NextRequest) {
 
     const { message, history } = validation.data;
 
-    // Call Gemini with user message and validated conversation history
-    const response = await chat(message, history);
+    // Guardrails: block prompt injections and off-topic questions
+    // BEFORE any embedding or LLM call (zero token cost when blocked)
+    const guardrail = evaluateGuardrails(message);
+    if (!guardrail.allowed) {
+      return NextResponse.json({
+        reply: guardrail.reply,
+        sources: [],
+        blocked: guardrail.reason,
+      });
+    }
+
+    // RAG: retrieve relevant knowledge chunks, then call Gemini with history
+    const response = await chatWithRAG(message, history);
 
     return NextResponse.json({
       reply: response.reply,
+      sources: response.sources,
     });
   } catch (error: unknown) {
     const rawError = error instanceof Error ? error.message : String(error);
+
+    if (rawError.includes("Knowledge base is empty")) {
+      return NextResponse.json(
+        {
+          error:
+            "The knowledge base has not been indexed yet. Run `npm run rag:index` and try again.",
+        },
+        { status: 503 }
+      );
+    }
 
     // Provide friendly, non-leaking error responses
     if (rawError.includes("GEMINI_API_KEY is not configured")) {
